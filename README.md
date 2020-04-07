@@ -53,6 +53,10 @@ docker build --tag discordbot .
 
 # Run the image
 docker run -d discordbot
+
+# RUn the image personalized
+docker run -d --restart unless-stopped --name TinyBot discordbot
+
 ```
 
 ## Author
