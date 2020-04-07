@@ -25,6 +25,10 @@ module.exports = {
 
       if (ytdl.validateURL(args[1])) {
         const songInfo = await ytdl.getInfo(args[1]);
+        if ((songInfo.length_seconds / 60) > 10) {
+          console.log(`${songInfo.title} is longer than 10 minutes!`);
+          return message.channel.send(`${songInfo.title} is longer than 10 minutes!`);
+        }
         const song = {
           title: songInfo.title,
           url: songInfo.video_url
