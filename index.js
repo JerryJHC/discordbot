@@ -5,6 +5,7 @@ const {
 	prefix,
 	token,
 } = require('./config.json');
+const { setMessage } = require('./util/message');
 
 const client = new Client();
 client.commands = new Discord.Collection();
@@ -39,16 +40,15 @@ client.on('message', async message => {
 	if (!message.content.startsWith(prefix)) return;
 
 	try {
-		if(commandName == "ban" || commandName == "userinfo") {
+		if (commandName == "ban" || commandName == "userinfo") {
 			command.execute(message, client);
 		} else {
 			command.execute(message);
 		}
 	} catch (error) {
 		console.error(error);
-		message.reply('There was an error trying to execute that command!');
+		message.reply(setMessage('There was an error trying to execute that command!'));
 	}
 });
-
 
 client.login(token);

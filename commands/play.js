@@ -1,5 +1,5 @@
-const { Util } = require("discord.js");
 const ytdl = require("ytdl-core");
+const { setMessage } = require('../util/message');
 
 module.exports = {
   name: "play",
@@ -13,21 +13,17 @@ module.exports = {
 
       const voiceChannel = message.member.voice.channel;
       if (!voiceChannel)
-        return message.channel.send(
-          "You need to be in a voice channel to play music!"
-        );
+        return message.channel.send(setMessage("You need to be in a voice channel to play music!"));
       const permissions = voiceChannel.permissionsFor(message.client.user);
       if (!permissions.has("CONNECT") || !permissions.has("SPEAK")) {
-        return message.channel.send(
-          "I need the permissions to join and speak in your voice channel!"
-        );
+        return message.channel.send(setMessage("I need the permissions to join and speak in your voice channel!"));
       }
 
       if (ytdl.validateURL(args[1])) {
         const songInfo = await ytdl.getInfo(args[1]);
         if ((songInfo.length_seconds / 60) > 10) {
           console.log(`${songInfo.title} is longer than 10 minutes!`);
-          return message.channel.send(`${songInfo.title} is longer than 10 minutes!`);
+          return message.channel.send(setMessage(`**${songInfo.title}** is longer than 10 minutes!`));
         }
         const song = {
           title: songInfo.title,
@@ -58,21 +54,19 @@ module.exports = {
           } catch (err) {
             console.log(err);
             queue.delete(message.guild.id);
-            return message.channel.send(err);
+            return message.channel.send(setMessage(err));
           }
         } else {
           serverQueue.songs.push(song);
-          return message.channel.send(
-            `${song.title} has been added to the queue!`
-          );
+          return message.channel.send(setMessage(`${song.title} has been added to the queue!`));
         }
       } else {
         console.log("Search by name");
-        message.channel.send('Sorry, I can only play songs through youtube links! but someday I could do more (-.-)/');
+        message.channel.send(setMessage('Sorry, I can only play songs through youtube links! but someday I could do more (-.-)/'));
       }
     } catch (error) {
       console.log(error);
-      message.channel.send(error.message);
+      message.channel.send(setMessage(error.message));
     }
   },
 
@@ -95,6 +89,6 @@ module.exports = {
       })
       .on("error", error => console.error(error));
     dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
-    serverQueue.textChannel.send(`Start playing: **${song.title}**`);
+    serverQueue.textChannel.send(setMessage(`Start playing: **${song.title}**\nRequested by: ${song.requester}`));
   }
 };

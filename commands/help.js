@@ -1,4 +1,5 @@
-const fs = require('fs')
+const fs = require('fs');
+const { setMessage } = require('../util/message');
 
 module.exports = {
 	name: 'help',
@@ -9,9 +10,9 @@ module.exports = {
 
 		for (const file of commandFiles) {
 			const command = require(`./${file}`);
-			str += `Name: ${command.name}, Description: ${command.description} \n`;
+			str += `**${command.name}**: ${command.description} \n`;
 		}
 
-		message.channel.send(str);
+		message.channel.send(setMessage(str));
 	},
 };
