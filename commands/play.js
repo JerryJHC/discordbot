@@ -31,8 +31,11 @@ module.exports = {
         }
         const song = {
           title: songInfo.title,
-          url: songInfo.video_url
+          url: songInfo.video_url,
+          length: songInfo.length_seconds,
+          requester: message.member.user.username
         };
+        console.log(song);
 
         if (!serverQueue) {
           const queueContruct = {
