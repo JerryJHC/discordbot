@@ -108,11 +108,12 @@ module.exports = {
           } else {
             serverQueue.songs.shift();
           }
-          this.play(message, serverQueue.songs[0]);
         } catch (error) {
+          console.log("play error");
           // If fails probably it'll be for a stop command execution
           console.error(error);
         }
+        this.play(message, serverQueue.songs[0]);
       })
       .on("error", error => {
         console.error(`An error has occured while playing song: ${song.title}`);
