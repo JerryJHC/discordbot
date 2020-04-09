@@ -9,7 +9,7 @@ module.exports = {
         if (!message.member.voice.channel) return message.channel.send(setMessage('**You have to be in a voice channel to list the music!**'));
         if (!serverQueue || serverQueue.songs.length == 0) return message.channel.send(setMessage('**The queue is empty!**'));
         let now = serverQueue.songs[0];
-        let nowPlaying = `__**Now Playing**__\n${this.formatSongInfo(now)}`;
+        let nowPlaying = `__**Now Playing**__\n${this.formatSongInfo(now)}${message.client.loop.queue || message.client.loop.single ? `\n\n**Loop ${message.client.loop.queue ? 'queue' : 'single'} is enabled**` : ''}`;
         if (serverQueue.songs.length > 1) {
             nowPlaying += `\n\n__**Queue**__`;
             // Paging
@@ -25,7 +25,7 @@ module.exports = {
                 }
             }
             if (pageContent != nowPlaying) pages.push(pageContent);
-            
+
             const embed = setMessage(pages[page - 1]).setFooter(`Page ${page} of ${pages.length}`);
 
             return message.channel.send(embed).then(msg => {

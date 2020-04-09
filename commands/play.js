@@ -36,6 +36,7 @@ module.exports = {
         console.log(error);
         return message.channel.send(setMessage(`**Something went wrong while trying to get the song, Please try again!**`));
       }
+      console.log(songInfo);
       if ((songInfo.length_seconds / 60) > 10) {
         console.log(`${songInfo.title} is longer than 10 minutes!`);
         return message.channel.send(setMessage(`**${songInfo.title}** is longer than 10 minutes!`));
@@ -44,7 +45,8 @@ module.exports = {
         title: songInfo.title,
         url: songInfo.video_url,
         length: songInfo.length_seconds,
-        requester: message.member.user.username
+        requester: message.member.user.username,
+        message: true
       };
       console.log(song);
 
@@ -77,7 +79,7 @@ module.exports = {
       }
     } catch (error) {
       console.log(error);
-      message.channel.send(setMessage(error.message));
+      return message.channel.send(setMessage("**Something went wrong while trying to get the song, Please try again!**"));
     }
   },
 
@@ -95,8 +97,22 @@ module.exports = {
     const dispatcher = serverQueue.connection
       .play(ytdl(song.url))
       .on("finish", () => {
-        serverQueue.songs.shift();
-        this.play(message, serverQueue.songs[0]);
+        try {
+          if (message.client.loop.queue) {
+            let current = serverQueue.songs.shift();
+            current.message = true;
+            serverQueue.songs.push(current);
+          }
+          else if (message.client.loop.single) {
+            serverQueue.songs[0].message = true;
+          } else {
+            serverQueue.songs.shift();
+          }
+          this.play(message, serverQueue.songs[0]);
+        } catch (error) {
+          // If fails probably it'll be for a stop command execution
+          console.error(error);
+        }
       })
       .on("error", error => {
         console.error(`An error has occured while playing song: ${song.title}`);
@@ -104,6 +120,9 @@ module.exports = {
         this.play(message, serverQueue.songs[0]);
       });
     dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
-    serverQueue.textChannel.send(setMessage(`Start playing: **${song.title}**\nRequested by: ${song.requester}`));
+    if (song.message) {
+      serverQueue.textChannel.send(setMessage(`Start playing: **${song.title}**\nRequested by: ${song.requester}${message.client.loop.single ? "\nLoop single is enabled." : ''}`));
+      song.message = false;
+    }
   }
 };
