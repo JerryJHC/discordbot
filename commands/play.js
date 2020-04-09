@@ -29,7 +29,13 @@ module.exports = {
           link = s.items[0].link;
         }
       }
-      const songInfo = await ytdl.getInfo(link);
+      let songInfo;
+      try {
+        songInfo = await ytdl.getInfo(link);
+      } catch (error) {
+        console.log(error);
+        return message.channel.send(setMessage(`**Something went wrong while trying to get the song, Please try again!**`));
+      }
       if ((songInfo.length_seconds / 60) > 10) {
         console.log(`${songInfo.title} is longer than 10 minutes!`);
         return message.channel.send(setMessage(`**${songInfo.title}** is longer than 10 minutes!`));
@@ -92,7 +98,11 @@ module.exports = {
         serverQueue.songs.shift();
         this.play(message, serverQueue.songs[0]);
       })
-      .on("error", error => console.error(error));
+      .on("error", error => {
+        console.error(`An error has occured while playing song: ${song.title}`);
+        console.error(error);
+        this.play(message, serverQueue.songs[0]);
+      });
     dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
     serverQueue.textChannel.send(setMessage(`Start playing: **${song.title}**\nRequested by: ${song.requester}`));
   }

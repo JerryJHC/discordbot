@@ -6,8 +6,8 @@ module.exports = {
     description: 'List all songs in the queue!',
     execute(message) {
         const serverQueue = message.client.queue.get(message.guild.id);
-        if (!message.member.voice.channel) return message.channel.send('You have to be in a voice channel to list the music!');
-        if (!serverQueue || serverQueue.songs.length == 0) return message.channel.send('The queue is empty!');
+        if (!message.member.voice.channel) return message.channel.send(setMessage('**You have to be in a voice channel to list the music!**'));
+        if (!serverQueue || serverQueue.songs.length == 0) return message.channel.send(setMessage('**The queue is empty!**'));
         let now = serverQueue.songs[0];
         let nowPlaying = `__**Now Playing**__\n${this.formatSongInfo(now)}`;
         if (serverQueue.songs.length > 1) {
