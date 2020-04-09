@@ -8,6 +8,11 @@ module.exports = {
 		if (!message.member.voice.channel) return message.channel.send(setMessage('You have to be in a voice channel to stop the music!'));
 		if (!serverQueue) return message.channel.send(setMessage("**There's no song in the queue!**"));
 		serverQueue.songs = [];
-		serverQueue.connection.dispatcher.end();
+		try {
+			serverQueue.connection.dispatcher.end();
+		} catch (error) {
+			console.error(error)
+		}
+		message.channel.send(setMessage("**The queue was successfully cleaned!**"));
 	},
 };
