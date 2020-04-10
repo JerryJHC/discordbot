@@ -9,6 +9,7 @@ module.exports = {
 		if (!serverQueue) return message.channel.send(setMessage("**There's no song in the queue!**"));
 		serverQueue.songs = [];
 		try {
+			if(serverQueue.connection.dispatcher.paused) serverQueue.connection.dispatcher.resume();
 			serverQueue.connection.dispatcher.end();
 		} catch (error) {
 			console.error(error)

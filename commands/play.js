@@ -36,7 +36,7 @@ module.exports = {
         console.log(error);
         return message.channel.send(setMessage(`**Something went wrong while trying to get the song, Please try again!**`));
       }
-      console.log(songInfo);
+
       if ((songInfo.length_seconds / 60) > 10) {
         console.log(`${songInfo.title} is longer than 10 minutes!`);
         return message.channel.send(setMessage(`**${songInfo.title}** is longer than 10 minutes!`));
