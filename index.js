@@ -32,12 +32,14 @@ client.once('disconnect', () => {
 });
 
 client.on('message', async message => {
+	if (message.author.bot) return;
+	if (!message.content.startsWith(prefix)) return;
+
 	const args = message.content.slice(prefix.length).split(/ +/);
 	const commandName = args.shift().toLowerCase();
 	const command = client.commands.get(commandName);
 
-	if (message.author.bot) return;
-	if (!message.content.startsWith(prefix)) return;
+	if (!command) return message.reply(setMessage(`**${commandName} is not a valid command!**\n**${prefix}help**: List all available commands`));
 
 	try {
 		if (commandName == "ban" || commandName == "userinfo") {
