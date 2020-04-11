@@ -22,9 +22,9 @@ module.exports = {
       if (ytpl.validateURL(link)) {
         console.log("It is a playlist");
         ytpl(link).then(async r => {
-          for (let i = 0; i < r.items.length; i++)
-            await this.addSong('', voiceChannel, message, r.items[i]);
-          return message.channel.send(setMessage(`Queued **${r.total_items}** elements from playlist **${r.title}**.`));
+          let msgs = [];
+          for (let i = 0; i < r.items.length; i++) msgs.push(await this.addSong('', voiceChannel, message, r.items[i]));
+          return message.channel.send(setMessage(`Queued **${r.total_items}** items from playlist **${r.title}**.${msgs.find(v => v.endsWith("is longer than 10 minutes!")) ? "\nSome items were removed due to a duration longer than 10 minutes." : ""}`));
         }).catch(err => {
           console.log(err);
           return message.channel.send(setMessage(`**Something went wrong trying to get songs from playlist. Please try again!**`));
@@ -62,6 +62,10 @@ module.exports = {
         video_url: basicInfo.url_simple || basicInfo.link,
         length_seconds: basicInfo.duration || basicInfo.length
       };
+      if (songInfo.length_seconds.length > 4) {
+        console.log(`${songInfo.title} is longer than 10 minutes!`);
+        return `**${songInfo.title}** is longer than 10 minutes!`;
+      }
     } else {
       try {
         songInfo = await ytdl.getInfo(link);
