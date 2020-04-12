@@ -9,7 +9,7 @@ module.exports = {
         let queue = serverQueue.songs.splice(1, serverQueue.songs.length);
         this.shuffleArray(queue);
         queue.forEach(v => serverQueue.songs.push(v));
-        return message.channel.send(setMessage(`${queue.length} songs have been shuffled`));
+        return message.channel.send(setMessage(`**${queue.length}** songs have been shuffled`));
     },
     shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {

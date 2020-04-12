@@ -20,11 +20,17 @@ module.exports = {
 
       let link = args[1];
       if (ytpl.validateURL(link)) {
-        console.log("It is a playlist");
         ytpl(link).then(async r => {
-          let msgs = [];
-          for (let i = 0; i < r.items.length; i++) msgs.push(await this.addSong('', voiceChannel, message, r.items[i]));
-          return message.channel.send(setMessage(`Queued **${r.total_items}** items from playlist **${r.title}**.${msgs.find(v => v.endsWith("is longer than 10 minutes!")) ? "\nSome items were removed due to a duration longer than 10 minutes." : ""}`));
+          let msgs = [], deleted = 0;
+          for (let i = 0; i < r.items.length; i++) {
+            if (r.items[i].duration) {
+              let res = await this.addSong('', voiceChannel, message, r.items[i]);
+              if (res) msgs.push(res);
+            }
+            else deleted++;
+          }
+          let longItems = msgs.filter(v => v.endsWith("is longer than 10 minutes!"));
+          return message.channel.send(setMessage(`Queued **${r.total_items - deleted - longItems.length}** items from playlist **${r.title}**.${longItems.length > 0 ? `\n**${longItems.length}** items were removed due to a duration longer than 10 minutes.` : ''}${deleted > 0 ? `\n**${deleted}** items are no longer available on youtube` : ''}`));
         }).catch(err => {
           console.log(err);
           return message.channel.send(setMessage(`**Something went wrong trying to get songs from playlist. Please try again!**`));
