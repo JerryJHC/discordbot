@@ -61,6 +61,6 @@ module.exports = {
         }
     },
     formatSongInfo(song) {
-        return `**${song.title}**\nRequested by: ${song.requester} [**${getTime(song.length)}**]`
+        return `**[${song.title}](${song.url})**\nRequested by: ${song.requester} [**${getTime(song.length)}**]`
     }
 };

@@ -30,7 +30,7 @@ module.exports = {
             else deleted++;
           }
           let longItems = msgs.filter(v => v.endsWith("is longer than 10 minutes!"));
-          return message.channel.send(setMessage(`Queued **${r.total_items - deleted - longItems.length}** items from playlist **${r.title}**.${longItems.length > 0 ? `\n**${longItems.length}** items were removed due to a duration longer than 10 minutes.` : ''}${deleted > 0 ? `\n**${deleted}** items are no longer available on youtube` : ''}`));
+          return message.channel.send(setMessage(`Queued **${r.total_items - deleted - longItems.length}** items from playlist **[${r.title}](${link})**.${longItems.length > 0 ? `\n**${longItems.length}** items were removed due to a duration longer than 10 minutes.` : ''}${deleted > 0 ? `\n**${deleted}** items are no longer available on youtube` : ''}`));
         }).catch(err => {
           console.log(err);
           return message.channel.send(setMessage(`**Something went wrong trying to get songs from playlist. Please try again!**`));
@@ -118,7 +118,7 @@ module.exports = {
       }
     } else {
       serverQueue.songs.push(song);
-      return `**${song.title}** has been added to the queue!\nRequested by: ${song.requester}`;
+      return `**[${song.title}](${song.url})** has been added to the queue!\nRequested by: ${song.requester}`;
     }
   },
 
@@ -161,7 +161,7 @@ module.exports = {
       });
     dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
     if (song.message) {
-      serverQueue.textChannel.send(setMessage(`Start playing: **${song.title}**\nRequested by: ${song.requester}${message.client.loop.single ? "\nLoop single is enabled." : ''}`));
+      serverQueue.textChannel.send(setMessage(`Start playing: **[${song.title}](${song.url})**\nRequested by: ${song.requester}${message.client.loop.single ? "\nLoop single is enabled." : ''}`));
       song.message = false;
     }
   }
