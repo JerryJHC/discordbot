@@ -66,7 +66,8 @@ module.exports = {
       songInfo = {
         title: basicInfo.title,
         video_url: basicInfo.url_simple || basicInfo.link,
-        length_seconds: basicInfo.duration || basicInfo.length
+        length_seconds: basicInfo.duration || basicInfo.length,
+        thumbnail: basicInfo.thumbnail
       };
       if (songInfo.length_seconds.length > 4) {
         console.log(`${songInfo.title} is longer than 10 minutes!`);
@@ -88,6 +89,7 @@ module.exports = {
       title: songInfo.title,
       url: songInfo.video_url,
       length: songInfo.length_seconds,
+      thumbnail: songInfo.thumbnail || songInfo.player_response.videoDetails.thumbnail.thumbnails[0].url,
       requester: message.member.user.username,
       message: true
     };
@@ -161,7 +163,7 @@ module.exports = {
       });
     dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
     if (song.message) {
-      serverQueue.textChannel.send(setMessage(`Start playing: **[${song.title}](${song.url})**\nRequested by: ${song.requester}${message.client.loop.single ? "\nLoop single is enabled." : ''}`));
+      serverQueue.textChannel.send(setMessage(`Start playing: **[${song.title}](${song.url})**\nRequested by: ${song.requester}${message.client.loop.single ? "\nLoop single is enabled." : ''}`).setThumbnail(song.thumbnail));
       song.message = false;
     }
   }
