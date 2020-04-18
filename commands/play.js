@@ -91,7 +91,8 @@ module.exports = {
       length: songInfo.length_seconds,
       thumbnail: songInfo.thumbnail || songInfo.player_response.videoDetails.thumbnail.thumbnails[0].url,
       requester: message.member.user.username,
-      message: true
+      message: true,
+      retries: 0
     };
     console.log(song);
 
@@ -136,7 +137,7 @@ module.exports = {
     }
 
     const dispatcher = serverQueue.connection
-      .play(ytdl(song.url))
+      .play(ytdl(song.url, { range: { start: '0' }, filter: "audioonly", quality: "highestaudio" }))
       .on("finish", () => {
         try {
           if (message.client.loop.queue) {
@@ -151,7 +152,7 @@ module.exports = {
           }
         } catch (error) {
           console.log("play error");
-          // If fails probably it'll be for a stop command execution
+          // If it fails probably it'll be for a stop command execution
           console.error(error);
         }
         this.play(message, serverQueue.songs[0]);
@@ -159,6 +160,10 @@ module.exports = {
       .on("error", error => {
         console.error(`An error has occured while playing song: ${song.title}`);
         console.error(error);
+        if (++serverQueue.songs[0].retries > 5) {
+          serverQueue.textChannel.send(setMessage(`Something was wrong while playing **${song.title}** - Skipping song`));
+          serverQueue.songs.shift();
+        }
         this.play(message, serverQueue.songs[0]);
       });
     dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
