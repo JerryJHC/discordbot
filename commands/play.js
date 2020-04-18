@@ -160,9 +160,14 @@ module.exports = {
       .on("error", error => {
         console.error(`An error has occured while playing song: ${song.title}`);
         console.error(error);
-        if (++serverQueue.songs[0].retries > 5) {
-          serverQueue.textChannel.send(setMessage(`Something was wrong while playing **${song.title}** - Skipping song`));
-          serverQueue.songs.shift();
+        try {
+          if (++serverQueue.songs[0].retries > 5) {
+            serverQueue.textChannel.send(setMessage(`Something was wrong while playing **${song.title}** - Skipping song`));
+            serverQueue.songs.shift();
+          }
+        } catch (err) {
+          console.log("Error executing retries");
+          console.log(err);
         }
         this.play(message, serverQueue.songs[0]);
       });
