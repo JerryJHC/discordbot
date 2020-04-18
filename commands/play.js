@@ -20,7 +20,7 @@ module.exports = {
 
       let link = args[1];
       if (ytpl.validateURL(link)) {
-        ytpl(link).then(async r => {
+        ytpl(link, { limit: 0 }).then(async r => {
           let msgs = [], deleted = 0;
           for (let i = 0; i < r.items.length; i++) {
             if (r.items[i].duration) {
