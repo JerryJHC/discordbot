@@ -14,6 +14,7 @@ module.exports = {
             if (pos) {
                 if (pos == 0 || pos > serverQueue.songs.length) return message.channel.send(setMessage(`**A position between 1 and ${serverQueue.songs.length} is required!**`));
                 let removedSong = serverQueue.songs.splice(pos, 1);
+                if (pos < serverQueue.endQueue) serverQueue.endQueue--;
                 console.log(removedSong);
                 return message.channel.send(setMessage(`**${removedSong[0].title} was successfully removed!**`));
             }

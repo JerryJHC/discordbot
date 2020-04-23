@@ -102,6 +102,7 @@ module.exports = {
         voiceChannel: voiceChannel,
         connection: null,
         songs: [],
+        endQueue: 1,
         volume: 5,
         playing: true
       };
@@ -120,7 +121,8 @@ module.exports = {
         return "**An error occurred while trying to join the channel!**";
       }
     } else {
-      serverQueue.songs.push(song);
+      serverQueue.songs.splice(serverQueue.endQueue, 0, song);
+      serverQueue.endQueue++;
       return `**[${song.title}](${song.url})** has been added to the queue!\nRequested by: ${song.requester}`;
     }
   },
@@ -156,6 +158,7 @@ module.exports = {
           console.error(error);
         }
         this.play(message, serverQueue.songs[0]);
+        serverQueue.endQueue--;
       })
       .on("error", error => {
         console.error(`An error has occured while playing song: ${song.title}`);
@@ -170,6 +173,7 @@ module.exports = {
           console.log(err);
         }
         this.play(message, serverQueue.songs[0]);
+        serverQueue.endQueue--;
       });
     dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
     if (song.message) {
