@@ -158,7 +158,7 @@ module.exports = {
           console.error(error);
         }
         this.play(message, serverQueue.songs[0]);
-        serverQueue.endQueue--;
+        if (serverQueue.endQueue > 1) serverQueue.endQueue--; else serverQueue.endQueue = serverQueue.songs.length;
       })
       .on("error", error => {
         console.error(`An error has occured while playing song: ${song.title}`);
