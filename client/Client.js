@@ -13,6 +13,8 @@ module.exports = class extends Client {
 
 		this.loop = { queue: false, single: false };
 
+		this.playingMessages = true;
+
 		this.config = config;
 	}
 };

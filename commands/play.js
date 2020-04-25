@@ -104,7 +104,7 @@ module.exports = {
         songs: [],
         endQueue: 1,
         volume: 5,
-        playing: true
+        playing: true,
       };
 
       queue.set(message.guild.id, queueContruct);
@@ -165,7 +165,7 @@ module.exports = {
         console.error(error);
         try {
           if (++serverQueue.songs[0].retries > 5) {
-            serverQueue.textChannel.send(setMessage(`Something was wrong while playing **${song.title}** - Skipping song`));
+            if (message.client.playingMessages) serverQueue.textChannel.send(setMessage(`Something was wrong while playing **${song.title}** - Skipping song`));
             serverQueue.songs.shift();
           }
         } catch (err) {
@@ -176,7 +176,7 @@ module.exports = {
         serverQueue.endQueue--;
       });
     dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
-    if (song.message) {
+    if (message.client.playingMessages && song.message) {
       serverQueue.textChannel.send(setMessage(`Start playing: **[${song.title}](${song.url})**\nRequested by: ${song.requester}${message.client.loop.single ? "\nLoop single is enabled." : ''}`).setThumbnail(song.thumbnail));
       song.message = false;
     }
