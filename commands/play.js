@@ -139,7 +139,7 @@ module.exports = {
     }
 
     const dispatcher = serverQueue.connection
-      .play(ytdl(song.url, { filter: "audioonly", quality: "highestaudio" }))
+      .play(ytdl(song.url, { filter: "audioonly", quality: "highestaudio", highWaterMark: 1 << 25 }))
       .on("finish", () => {
         try {
           if (message.client.loop.queue) {
