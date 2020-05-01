@@ -4,12 +4,11 @@ A simple discord bot which helps you manage your server by providing useful comm
 
 ## Features
 
-- Ban
 - Userinfo
 - Play music
 - Skip songs
 - Stop music
-- Purge text messages
+- Loop music
 
 ## Requirements
 
