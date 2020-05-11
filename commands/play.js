@@ -138,44 +138,62 @@ module.exports = {
       return;
     }
 
-    const dispatcher = serverQueue.connection
-      .play(ytdl(song.url, { filter: "audioonly", quality: "highestaudio", highWaterMark: 1 << 25 }))
-      .on("finish", () => {
-        try {
-          if (message.client.loop.queue) {
-            let current = serverQueue.songs.shift();
-            current.message = true;
-            serverQueue.songs.push(current);
+    console.log(song);
+
+    try {
+      const dispatcher = serverQueue.connection
+        .play(ytdl(song.url, { filter: "audioonly", quality: "highestaudio", highWaterMark: 1 << 25 }))
+        .on("finish", () => {
+          try {
+            if (message.client.loop.queue) {
+              let current = serverQueue.songs.shift();
+              current.message = true;
+              serverQueue.songs.push(current);
+            }
+            else if (message.client.loop.single) {
+              serverQueue.songs[0].message = true;
+            } else {
+              serverQueue.songs.shift();
+            }
+          } catch (error) {
+            console.log("play error");
+            // If it fails probably it'll be for a stop command execution
+            console.error(error);
           }
-          else if (message.client.loop.single) {
-            serverQueue.songs[0].message = true;
-          } else {
-            serverQueue.songs.shift();
-          }
-        } catch (error) {
-          console.log("play error");
-          // If it fails probably it'll be for a stop command execution
+          this.play(message, serverQueue.songs[0]);
+          if (serverQueue.endQueue > 1) serverQueue.endQueue--; else serverQueue.endQueue = serverQueue.songs.length;
+        })
+        .on("error", error => {
+          console.error(`An error has occured while playing song: ${song.title}`);
           console.error(error);
-        }
-        this.play(message, serverQueue.songs[0]);
-        if (serverQueue.endQueue > 1) serverQueue.endQueue--; else serverQueue.endQueue = serverQueue.songs.length;
-      })
-      .on("error", error => {
-        console.error(`An error has occured while playing song: ${song.title}`);
-        console.error(error);
-        try {
-          if (++serverQueue.songs[0].retries > 5) {
-            if (message.client.playingMessages) serverQueue.textChannel.send(setMessage(`Something was wrong while playing **${song.title}** - Skipping song`));
-            serverQueue.songs.shift();
+          try {
+            if (++serverQueue.songs[0].retries > 5) {
+              if (message.client.playingMessages) serverQueue.textChannel.send(setMessage(`Something was wrong while playing **${song.title}** - Skipping song`));
+              serverQueue.songs.shift();
+            }
+          } catch (err) {
+            console.log("Error executing retries");
+            console.log(err);
           }
-        } catch (err) {
-          console.log("Error executing retries");
-          console.log(err);
+          this.play(message, serverQueue.songs[0]);
+          serverQueue.endQueue--;
+        });
+      dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
+    } catch (err) {
+      console.log("Dispatcher error")
+      console.log(err);
+      try {
+        if (++serverQueue.songs[0].retries > 5) {
+          if (message.client.playingMessages) serverQueue.textChannel.send(setMessage(`Something was wrong while playing **${song.title}** - Skipping song`));
+          serverQueue.songs.shift();
         }
-        this.play(message, serverQueue.songs[0]);
-        serverQueue.endQueue--;
-      });
-    dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
+      } catch (err) {
+        console.log("Error executing retries");
+        console.log(err);
+      }
+      this.play(message, serverQueue.songs[0]);
+      serverQueue.endQueue--;
+    }
     if (message.client.playingMessages && song.message) {
       serverQueue.textChannel.send(setMessage(`Start playing: **[${song.title}](${song.url})**\nRequested by: ${song.requester}${message.client.loop.single ? "\nLoop single is enabled." : ''}`).setThumbnail(song.thumbnail));
       song.message = false;
