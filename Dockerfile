@@ -11,7 +11,4 @@ RUN npm ci
 
 COPY . .
 
-RUN cp /user/src/app/config.prod.json /usr/src/app/config.json
-RUN rm /user/src/app/config.prod.json
-
 CMD [ "node", "index.js" ]
