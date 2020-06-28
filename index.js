@@ -4,10 +4,29 @@ const Client = require('./client/Client');
 const {
 	prefix,
 	token,
+	development,
+	database
 } = require('./config.json');
 const { setMessage } = require('./util/message');
 
-const client = new Client();
+const client = new Client(database);
+
+// MySQL
+
+client.database.connect(err => {
+	if (err) throw err;
+	console.log("DataBase Connected!");
+	client.database.query("select * from Config", (err, result) => {
+		if (err) throw err;
+		console.log("DataBase Config:", result[0]);
+		client.loop.queue = result[0].loopQueue;
+		client.loop.single = result[0].loopSingle;
+		client.playingMessages = result[0].playingMessages;
+	});
+});
+
+// MySQL
+
 client.commands = new Discord.Collection();
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -52,5 +71,17 @@ client.on('message', async message => {
 		message.reply(setMessage('There was an error trying to execute that command!'));
 	}
 });
+
+if (development) {
+	client.on('shardError', error => {
+		console.error('A websocket connection encountered an error:', error);
+	});
+
+	client.on('unhandledRejection', error => {
+		console.error('Unhandled promise rejection:', error);
+	});
+
+	client.on('debug', console.log);
+}
 
 client.login(token);

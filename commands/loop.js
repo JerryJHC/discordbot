@@ -21,6 +21,10 @@ module.exports = {
         } else {
             msg = `${args[1]} is not a valid option!`;
         }
+        message.client.database.query(`UPDATE Config SET loopQueue = ${message.client.loop.queue ? 1 : 0} , loopSingle = ${message.client.loop.single ? 1 : 0}`, (err, result) => {
+            if (err) console.log("DataBase Config cannot be updated!");
+            else console.log("DataBase Config - Loop updated!");
+        });
         console.log(message.client.loop);
         message.channel.send(setMessage(`**${msg}**`));
     },
